@@ -47,6 +47,11 @@ var KTDatatablesContent = {
                                     <i class="las la-edit fs-2"></i>
                                 </button>
                             </a>
+                            <a href="javascript:void(0)" onclick="delete_role(`+ data + `);">
+                                <button class="btn p-1">
+                                    <i class="las la-trash fs-2"></i>
+                                </button>
+                            </a>
                         </div>
                         `;
                     },
@@ -293,6 +298,42 @@ const KTDataEdit = function () {
 jQuery(document).ready((function () {
     KTDatatablesContent.initDatatable();
 
-    KTDataAdd.init();
     KTDataEdit.init();
 }));
+
+function delete_role(id_role) {
+    swal.fire({
+        title: 'Apakah anda yakin?',
+        text: "Data Role akan dihapus!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, hapus!',
+        showLoaderOnConfirm: true,
+
+        preConfirm: function () {
+            return new Promise(function (resolve) {
+                $.ajax({
+                    url: base_url + '/master/role/delete/' + id_role,
+                    type: 'POST',
+                    data: { '_method': 'POST', '_token': csrf_token },
+                    dataType: 'json'
+                }).done(function (response) {
+                    swal.fire({
+                        title: "Sukses",
+                        text: "Data Role berhasil di hapus!",
+                        timer: 1500,
+                        showConfirmButton: false,
+                        icon: 'success'
+                    }).then(function () {
+                        $('#kt_datatable_role').DataTable().ajax.reload();
+                    }
+                    );
+                }).fail(function () {
+                    swal.fire('Oops...', 'Something went wrong, please try again !', 'error');
+                });
+            });
+        }, allowOutsideClick: false
+    });
+}

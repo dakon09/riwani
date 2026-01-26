@@ -8,7 +8,7 @@
     <base href="{{ url('/') }}" />
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="base_url" content="{{ env('APP_URL') }}">
+    <meta name="base_url" content="{{ url('/') }}">
     <meta name="description" content="Laravel" />
     <meta name="keywords" content="Laravel" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -139,8 +139,8 @@
                                     <!--end::Menu separator-->
                                     <!--begin::Menu item-->
                                     <div class="menu-item px-5 my-1">
-                                        <a href="{{ route('profile.show') }}" class="menu-link px-5">Account
-                                            Settings</a>
+                                        <a href="#" class="menu-link px-5" data-bs-toggle="modal"
+                                            data-bs-target="#kt_modal_edit_profile">Edit Profile</a>
                                     </div>
                                     <!--end::Menu item-->
                                 </div>
@@ -472,6 +472,133 @@
     @endif
     <!--end::Custom Javascript-->
     <!--end::Javascript-->
+    <!--begin::Modal - Edit Profile-->
+    <div class="modal fade" id="kt_modal_edit_profile" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered mw-650px">
+            <div class="modal-content">
+                <div class="modal-header" id="kt_modal_edit_profile_header">
+                    <h2 class="fw-bold">Edit Profile</h2>
+                    <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
+                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span
+                                class="path2"></span></i>
+                    </div>
+                </div>
+                <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
+                    <form id="kt_modal_edit_profile_form" class="form" action="#">
+                        @csrf
+                        <div class="mb-7">
+                            <label class="d-block fw-semibold fs-6 mb-5">Avatar</label>
+                            <div class="style-user-profile d-flex flex-column align-items-center">
+                                <div class="symbol symbol-100px mb-5">
+                                    <img src="{{ asset('assets/media/avatars/blank.png') }}" class="shadow-sm"
+                                        alt="user" />
+                                </div>
+                                <div class="fs-7 text-muted">Allowed file types: png, jpg, jpeg.</div>
+                            </div>
+                        </div>
+                        <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse"
+                            href="#kt_modal_edit_profile_user_info" role="button" aria-expanded="false"
+                            aria-controls="kt_modal_edit_profile_user_info">User Information
+                            <span class="ms-2 rotate-180">
+                                <i class="ki-duotone ki-down fs-3"></i>
+                            </span>
+                        </div>
+                        <div id="kt_modal_edit_profile_user_info" class="collapse show">
+                            <div class="row g-9 mb-7">
+                                <div class="col-md-6 fv-row">
+                                    <label class="required fs-6 fw-semibold mb-2">Full Name</label>
+                                    <div class="input-group input-group-solid mb-5">
+                                        <span class="input-group-text">
+                                            <i class="ki-duotone ki-user fs-2">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                        </span>
+                                        <input type="text" class="form-control form-control-solid"
+                                            placeholder="Full Name" name="name"
+                                            value="{{ Auth::user()->name }}" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6 fv-row">
+                                    <label class="required fs-6 fw-semibold mb-2">Email</label>
+                                    <div class="input-group input-group-solid mb-5">
+                                        <span class="input-group-text">
+                                            <i class="ki-duotone ki-sms fs-2">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                        </span>
+                                        <input type="email" class="form-control form-control-solid"
+                                            placeholder="Email Address" name="email"
+                                            value="{{ Auth::user()->email }}" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse"
+                            href="#kt_modal_edit_profile_password_info" role="button" aria-expanded="false"
+                            aria-controls="kt_modal_edit_profile_password_info">Change Password
+                            <span class="ms-2 rotate-180">
+                                <i class="ki-duotone ki-down fs-3"></i>
+                            </span>
+                        </div>
+                        <div id="kt_modal_edit_profile_password_info" class="collapse show">
+                            <div
+                                class="notice d-flex bg-light-warning rounded border-warning border border-dashed mb-9 p-6">
+                                <i class="ki-duotone ki-information fs-2tx text-warning me-4">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                </i>
+                                <div class="d-flex flex-stack flex-grow-1">
+                                    <div class="fw-semibold">
+                                        <h4 class="text-gray-900 fw-bold">Password Notice</h4>
+                                        <div class="fs-6 text-gray-700">Leave the password fields blank to keep your
+                                            current password.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row g-9 mb-7">
+                                <div class="col-md-6 fv-row">
+                                    <label class="fs-6 fw-semibold mb-2">New Password</label>
+                                    <div class="input-group input-group-solid mb-5">
+                                        <span class="input-group-text">
+                                            <i class="ki-duotone ki-key fs-2">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                        </span>
+                                        <input type="password" class="form-control form-control-solid"
+                                            placeholder="New Password" name="password" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6 fv-row">
+                                    <label class="fs-6 fw-semibold mb-2">Confirm Password</label>
+                                    <div class="input-group input-group-solid mb-5">
+                                        <span class="input-group-text">
+                                            <i class="ki-duotone ki-check fs-2"></i>
+                                        </span>
+                                        <input type="password" class="form-control form-control-solid"
+                                            placeholder="Confirm Password" name="password_confirmation" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center pt-15">
+                            <button type="reset" class="btn btn-light me-3"
+                                data-bs-dismiss="modal">Discard</button>
+                            <button type="submit" id="kt_modal_edit_profile_submit" class="btn btn-primary">
+                                <span class="indicator-label">Submit</span>
+                                <span class="indicator-progress">Please wait...
+                                    <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end::Modal - Edit Profile-->
 </body>
 <!--end::Body-->
 

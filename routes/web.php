@@ -14,6 +14,9 @@ Route::name('dashboard.')->middleware(['auth:web',config('jetstream.auth_session
     Route::get('/', [DashboardController::class, 'index'])->name('index');
 });
 
+Route::post('/profile/update', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update_ajax')->middleware('auth');
+
+
 Route::name('master.')->prefix('master')->middleware(['auth:web',config('jetstream.auth_session'),'verified'])->group(function () {
     // user
     Route::name('user.')->controller(UserController::class)->prefix('user')->group(function () {
