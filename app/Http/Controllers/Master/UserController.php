@@ -61,8 +61,6 @@ class UserController extends Controller
         $attrclean['hash']=md5($attrclean['username']);
         $attrclean['password']=Hash::make($attrclean['password']);
 
-        $attrclean['mandatory_2fa']=0;
-
         $user=User::create($attrclean);
 
         $user->assignRole($attrclean['role']);
@@ -118,7 +116,6 @@ class UserController extends Controller
         $user->username=$attrclean['username'];
         $user->email=$attrclean['email'];
         (!is_null($attrclean['password']))?$user->password=$attrclean['password']:'';
-        $user->mandatory_2fa=0;
 
         $user->save();
         $user->syncRoles($attrclean['role_id']);

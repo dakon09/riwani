@@ -123,4 +123,21 @@ class RoleController extends Controller
         
         return response()->json(['status'=>true,'data'=>$data], 200);
     }
+
+    public function delete(Role $role)
+    {
+        try{
+            DB::beginTransaction();
+
+            $role->delete();
+
+            DB::commit();
+        }catch(\Exception $e){
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['status'=>false,'data'=>'Cannot Proccess'], 200);
+        }
+
+        return response()->json(['status'=>true,'data'=>'Deleted Successfully'], 200);
+    }
 }

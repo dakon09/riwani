@@ -33,6 +33,7 @@ Route::name('master.')->prefix('master')->middleware(['auth:web',config('jetstre
         Route::get('/detail/{role:id}', 'detail')->name('detail');
         Route::post('/insert', 'insert')->name('insert');
         Route::post('/update/{role:id}', 'update')->name('update');
+        Route::post('/delete/{role:id}', 'delete')->name('delete');
     });
 
     // permission
