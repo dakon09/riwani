@@ -3,21 +3,21 @@
 <!--begin::Head-->
 
 <head>
-    <title>Laravel</title>
+    <title>{{ config('app.name', 'BoilerPlate Harma') }}</title>
     <meta charset="utf-8" />
     <base href="{{ url('/') }}" />
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="base_url" content="{{ url('/') }}">
-    <meta name="description" content="Laravel" />
-    <meta name="keywords" content="Laravel" />
+    <meta name="description" content="{{ config('app.name', 'BoilerPlate Harma') }}" />
+    <meta name="keywords" content="{{ config('app.name', 'BoilerPlate Harma') }}" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="article" />
-    <meta property="og:title" content="Laravel" />
+    <meta property="og:title" content="{{ config('app.name', 'BoilerPlate Harma') }}" />
     <meta property="og:url" content="{{ env('APP_URL') }}" />
     <meta property="og:site_name" content="Metronic by Keenthemes" />
-    <link rel="canonical" href="Laravel" />
+    <link rel="canonical" href="{{ config('app.name', 'BoilerPlate Harma') }}" />
     <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
     <!--begin::Fonts(mandatory for all pages)-->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />

@@ -3,16 +3,16 @@
 	<!--begin::Head-->
 	<head>
         <base href="{{ url('/') }}" />
-		<title>HRIS Adex</title>
+		<title>{{ config('app.name', 'BoilerPlate Harma') }}</title>
 		<meta charset="utf-8" />
-		<meta name="description" content="HRIS Adex" />
-		<meta name="keywords" content="HRIS Adex" />
+		<meta name="description" content="{{ config('app.name', 'BoilerPlate Harma') }}" />
+		<meta name="keywords" content="{{ config('app.name', 'BoilerPlate Harma') }}" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta property="og:locale" content="en_US" />
 		<meta property="og:type" content="article" />
-		<meta property="og:title" content="HRIS Adex" />
+		<meta property="og:title" content="{{ config('app.name', 'BoilerPlate Harma') }}" />
 		<meta property="og:url" content="{{ url('/') }}" />
-		<meta property="og:site_name" content="HRIS Adex" />
+		<meta property="og:site_name" content="{{ config('app.name', 'BoilerPlate Harma') }}" />
 		<link rel="canonical" href="{{ url('/') }}" />
 		<link rel="shortcut icon" href="{{ asset('assets/media/logo-white.png') }}" />
 		<!--begin::Fonts(mandatory for all pages)-->
