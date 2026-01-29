@@ -4,9 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
@@ -21,9 +21,14 @@ class UserSeeder extends Seeder
         // create permissions
         $permissions = [
             'dashboard',
-            'master-user',
-            'master-role',
-            'master-permission',
+            'master_user',
+            'master_role',
+            'master_permission',
+            'umkm_index',
+            'umkm_create',
+            'umkm_edit',
+            'umkm_delete',
+            'umkm_import',
         ];
 
         foreach ($permissions as $permission) {

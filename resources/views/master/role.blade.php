@@ -97,8 +97,13 @@
                             <!--end::Input group-->
                             <!--begin::Input group-->
                             <div class="fv-row mb-10">
-                                <!--begin::Label-->
-                                <label class="required fw-semibold fs-6 mb-2">Permission</label>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="required fw-semibold fs-6">Permission</label>
+                                    <button type="button" id="btn_select_all_permissions" class="btn btn-sm btn-light-primary">
+                                        <i class="ki-duotone ki-check-double fs-2"></i>
+                                        Pilih Semua Permission
+                                    </button>
+                                </div>
                                 <!--end::Label-->
                                 <!--begin::Input-->
                                 <select class="form-select form-select-solid" name="permission" id="permission"
@@ -177,14 +182,20 @@
                             <!--end::Input group-->
                             <!--begin::Input group-->
                             <div class="fv-row mb-10">
-                                <!--begin::Label-->
-                                <label class="required fw-semibold fs-6 mb-2">Permission</label>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="required fw-semibold fs-6">Permission</label>
+                                    <button type="button" id="btn_select_all_permissions_edit" class="btn btn-sm btn-light-primary">
+                                        <i class="ki-duotone ki-check-double fs-2"></i>
+                                        Pilih Semua Permission
+                                    </button>
+                                </div>
                                 <!--end::Label-->
                                 <!--begin::Input-->
                                 <select class="form-select form-select-solid" name="permission_edit" id="permission_edit"
                                     data-control="select2" data-close-on-select="false"
                                     data-dropdown-parent="#kt_modal_edit_role" data-placeholder="Select an option"
                                     data-allow-clear="true" multiple="multiple">
+                                    <option></option>
                                     @foreach ($permissions as $item)
                                         <option value="{{ $item->name }}">{{ $item->name }}</option>
                                     @endforeach

@@ -106,8 +106,8 @@
                             <div class="app-navbar-item ms-1 ms-md-4" id="kt_header_user_menu_toggle">
                                 <!--begin::Menu wrapper-->
                                 <div class="cursor-pointer symbol symbol-35px"
-                                    data-kt-menu-trigger="{default: 'click', lg: 'hover'}"
-                                    data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
+                                    data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent"
+                                    data-kt-menu-placement="bottom-end">
                                     <img src="{{ asset('assets/media/avatars/blank.png') }}" class="rounded-3"
                                         alt="user" />
                                 </div>
@@ -119,16 +119,16 @@
                                         <div class="menu-content d-flex align-items-center px-3">
                                             <!--begin::Avatar-->
                                             <div class="symbol symbol-50px me-5">
-                                                <img src="{{ asset('assets/media/avatars/blank.png') }}"
-                                                    alt="user" />
+                                                <img src="{{ asset('assets/media/avatars/blank.png') }}" alt="user" />
                                             </div>
                                             <!--end::Avatar-->
                                             <!--begin::Username-->
                                             <div class="d-flex flex-column">
                                                 <div class="fw-bold d-flex align-items-center fs-5">
-                                                    {{ Auth::user()->name }}</div>
+                                                    {{ Auth::user()?->name ?? '-' }}
+                                                </div>
                                                 <a href="#"
-                                                    class="fw-semibold text-muted text-hover-primary fs-7">{{ Auth::user()->email }}</a>
+                                                    class="fw-semibold text-muted text-hover-primary fs-7">{{ Auth::user()?->email ?? '-' }}</a>
                                             </div>
                                             <!--end::Username-->
                                         </div>
@@ -233,7 +233,7 @@
                                         <!--end:Menu item-->
                                     @endcan
 
-                                    @canany(['master-user', 'master-role'])
+                                    @canany(['master_user', 'master_role', 'umkm_index'])
                                         <!--begin:Menu item-->
                                         <div class="menu-item pt-3">
                                             <!--begin:Menu content-->
@@ -244,7 +244,7 @@
                                             <!--end:Menu content-->
                                         </div>
                                         <!--end:Menu item-->
-                                        @canany(['master-user', 'master-role'])
+                                        @canany(['master_user', 'master_role'])
                                             <div data-kt-menu-trigger="click"
                                                 class="menu-item menu-accordion {{ request()->routeIs('master.user*') || request()->routeIs('master.role*') || request()->routeIs('master.branch*') ? 'here show' : '' }}">
                                                 <!--begin:Menu link-->
@@ -262,7 +262,7 @@
                                                 <!--end:Menu link-->
                                                 <!--begin:Menu sub-->
                                                 <div class="menu-sub menu-sub-accordion">
-                                                    @can('master-user')
+                                                    @can('master_user')
                                                         <!--begin:Menu item-->
                                                         <div class="menu-item">
                                                             <!--begin:Menu link-->
@@ -277,7 +277,7 @@
                                                         </div>
                                                         <!--end:Menu item-->
                                                     @endcan
-                                                    @can('master-role')
+                                                    @can('master_role')
                                                         <!--begin:Menu item-->
                                                         <div class="menu-item">
                                                             <!--begin:Menu link-->
@@ -293,25 +293,44 @@
                                                         <!--end:Menu item-->
                                                     @endcan
                                                     {{-- @can('master-permission')
-                                                        <!--begin:Menu item-->
-                                                        <div class="menu-item">
-                                                            <!--begin:Menu link-->
-                                                            <a class="menu-link {{ request()->routeIs('master.permission.index') ? 'active' : '' }}"
-                                                                href="{{ route('master.permission.index') }}">
-                                                                <span class="menu-bullet">
-                                                                    <span class="bullet bullet-dot"></span>
-                                                                </span>
-                                                                <span class="menu-title">Permission</span>
-                                                            </a>
-                                                            <!--end:Menu link-->
-                                                        </div>
-                                                        <!--end:Menu item-->
+                                                    <!--begin:Menu item-->
+                                                    <div class="menu-item">
+                                                        <!--begin:Menu link-->
+                                                        <a class="menu-link {{ request()->routeIs('master.permission.index') ? 'active' : '' }}"
+                                                            href="{{ route('master.permission.index') }}">
+                                                            <span class="menu-bullet">
+                                                                <span class="bullet bullet-dot"></span>
+                                                            </span>
+                                                            <span class="menu-title">Permission</span>
+                                                        </a>
+                                                        <!--end:Menu link-->
+                                                    </div>
+                                                    <!--end:Menu item-->
                                                     @endcan --}}
                                                 </div>
                                                 <!--end:Menu sub-->
                                             </div>
                                         @endcanany
                                     @endcanany
+
+                                    @can('umkm_index')
+                                        <div class="menu-item">
+                                            <!--begin:Menu link-->
+                                            <a class="menu-link {{ request()->routeIs('master.umkm*') ? 'active' : '' }}"
+                                                href="{{ route('master.umkm.index') }}">
+                                                <span class="menu-icon">
+                                                    <i class="ki-duotone ki-shop fs-2">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                        <span class="path3"></span>
+                                                    </i>
+                                                </span>
+                                                <span class="menu-title">Master UMKM</span>
+                                            </a>
+                                            <!--end:Menu link-->
+                                        </div>
+                                    @endcan
+
 
 
                                 </div>
@@ -348,14 +367,14 @@
                         <!--begin::Toolbar-->
                         <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
                             <!--begin::Toolbar container-->
-                            <div id="kt_app_toolbar_container"
-                                class="app-container container-fluid d-flex flex-stack">
+                            <div id="kt_app_toolbar_container" class="app-container container-fluid d-flex flex-stack">
                                 <!--begin::Page title-->
                                 <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
                                     <!--begin::Title-->
                                     <h1
                                         class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
-                                        {{ isset($title) ? $title : 'Dashboard' }}</h1>
+                                        {{ isset($title) ? $title : 'Dashboard' }}
+                                    </h1>
                                     <!--end::Title-->
                                     <!--begin::Breadcrumb-->
                                     <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
@@ -441,7 +460,7 @@
     <script>
         function delay(fn, ms) {
             let timer = 0
-            return function(...args) {
+            return function (...args) {
                 clearTimeout(timer)
                 timer = setTimeout(fn.bind(this, ...args), ms || 0)
             }
@@ -459,6 +478,7 @@
             })
         </script>
     @endif
+
     @if (session()->has('error'))
         <script>
             swal.fire({
@@ -479,8 +499,7 @@
                 <div class="modal-header" id="kt_modal_edit_profile_header">
                     <h2 class="fw-bold">Edit Profile</h2>
                     <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
-                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span
-                                class="path2"></span></i>
+                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
                     </div>
                 </div>
                 <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
@@ -516,7 +535,7 @@
                                         </span>
                                         <input type="text" class="form-control form-control-solid"
                                             placeholder="Full Name" name="name"
-                                            value="{{ Auth::user()->name }}" />
+                                            value="{{ Auth::user()?->name ?? '' }}" />
                                     </div>
                                 </div>
                                 <div class="col-md-6 fv-row">
@@ -530,7 +549,7 @@
                                         </span>
                                         <input type="email" class="form-control form-control-solid"
                                             placeholder="Email Address" name="email"
-                                            value="{{ Auth::user()->email }}" />
+                                            value="{{ Auth::user()?->email ?? '' }}" />
                                     </div>
                                 </div>
                             </div>
@@ -585,8 +604,7 @@
                             </div>
                         </div>
                         <div class="text-center pt-15">
-                            <button type="reset" class="btn btn-light me-3"
-                                data-bs-dismiss="modal">Discard</button>
+                            <button type="reset" class="btn btn-light me-3" data-bs-dismiss="modal">Discard</button>
                             <button type="submit" id="kt_modal_edit_profile_submit" class="btn btn-primary">
                                 <span class="indicator-label">Submit</span>
                                 <span class="indicator-progress">Please wait...

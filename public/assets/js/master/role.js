@@ -67,224 +67,280 @@ $('#search_role_name').keyup(delay(function (e) {
 }, 500));
 
 // Modul untuk mengelola logika form Tambah Role
-const KTDataAdd = function () {
-    const modalElement = document.getElementById('kt_modal_add_role');
-    const form = document.getElementById('kt_docs_form_add_role');
-    const submitButton = document.getElementById('kt_docs_form_add_role_submit');
-    const modal = new bootstrap.Modal(modalElement);
-    let validator;
+    const KTDataAdd = function () {
+        const modalElement = document.getElementById('kt_modal_add_role');
+        const form = document.getElementById('kt_docs_form_add_role');
+        const submitButton = document.getElementById('kt_docs_form_add_role_submit');
+        const selectAllButton = document.getElementById('btn_select_all_permissions');
+        const modal = new bootstrap.Modal(modalElement);
+        let validator;
 
-    const handleForm = function () {
-        validator = FormValidation.formValidation(
-            form,
-            {
-                fields: {
-                    'name': {
-                        validators: {
-                            notEmpty: { message: 'Nama Harus Diisi' }
-                        }
-                    },
-                    'permission': {
-                        validators: {
-                            notEmpty: { message: 'Permission Harus Diisi' }
-                        }
-                    },
-                },
-                plugins: {
-                    trigger: new FormValidation.plugins.Trigger(),
-                    bootstrap: new FormValidation.plugins.Bootstrap5({
-                        rowSelector: '.fv-row',
-                        eleInvalidClass: '',
-                        eleValidClass: ''
-                    })
-                }
-            }
-        );
-
-        // Revalidate Select2 input
-        $(form.querySelector('[name="permission"]')).on('change', function () {
-            validator.revalidateField('permission');
-        });
-
-        submitButton.addEventListener('click', function (e) {
-            e.preventDefault();
-            validator.validate().then(function (status) {
-                if (status === 'Valid') {
-                    submitButton.setAttribute('data-kt-indicator', 'on');
-                    submitButton.disabled = true;
-
-                    $.ajax({
-                        type: "POST",
-                        url: base_url + '/master/role/insert',
-                        data: {
-                            'name': $('#name').val(),
-                            'permission': $('#permission').val(),
-                            '_token': csrf_token
-                        },
-                        success: function (response) {
-                            if (response.status == true) {
-                                Swal.fire({
-                                    title: "Success",
-                                    text: "Data Role Berhasil Ditambahkan!",
-                                    icon: "success",
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    $('#kt_datatable_role').DataTable().ajax.reload();
-                                    modal.hide();
-                                    form.reset();
-                                });
-                            }
-                            else {
-                                Swal.fire('Oops...', response.data, 'error');
+        const handleForm = function () {
+            validator = FormValidation.formValidation(
+                form,
+                {
+                    fields: {
+                        'name': {
+                            validators: {
+                                notEmpty: { message: 'Nama Harus Diisi' }
                             }
                         },
-                        error: function (xhr) {
-                            Swal.fire("Error!", "Terjadi kesalahan saat menyimpan.", "error");
+                        'permission': {
+                            validators: {
+                                notEmpty: { message: 'Permission Harus Diisi' }
+                            }
                         },
-                        complete: function () {
-                            submitButton.removeAttribute('data-kt-indicator');
-                            submitButton.disabled = false;
-                        }
-                    });
-                } else {
-                    Swal.fire({
-                        text: "Maaf, Mohon lengkapi form terlebih dahulu.",
-                        icon: "error",
-                        buttonsStyling: false,
-                        confirmButtonText: "Ok, Mengerti!",
-                        customClass: { confirmButton: "btn btn-primary" }
-                    });
+                    },
+                    plugins: {
+                        trigger: new FormValidation.plugins.Trigger(),
+                        bootstrap: new FormValidation.plugins.Bootstrap5({
+                            rowSelector: '.fv-row',
+                            eleInvalidClass: '',
+                            eleValidClass: ''
+                        })
+                    }
                 }
+            );
+
+            // Revalidate Select2 input
+            $(form.querySelector('[name="permission"]')).on('change', function () {
+                validator.revalidateField('permission');
             });
-        });
-    }
 
-    return {
-        init: function () {
-            handleForm();
-        }
-    };
+            // Select All Permissions functionality
+            if (selectAllButton) {
+                selectAllButton.addEventListener('click', function() {
+                    const permissionSelect = $('#permission');
+                    const allOptions = permissionSelect.find('option:not(:disabled)').map(function() {
+                        return $(this).val();
+                    }).get();
+
+                    if (permissionSelect.val().length === allOptions.length) {
+                        permissionSelect.val(null).trigger('change');
+                        selectAllButton.innerHTML = '<i class="ki-duotone ki-check-double fs-2"></i> Pilih Semua Permission';
+                        selectAllButton.classList.remove('btn-active-primary');
+                        selectAllButton.classList.add('btn-light-primary');
+                    } else {
+                        permissionSelect.val(allOptions).trigger('change');
+                        selectAllButton.innerHTML = '<i class="ki-duotone ki-cross fs-2"></i> Hapus Semua Selection';
+                        selectAllButton.classList.remove('btn-light-primary');
+                        selectAllButton.classList.add('btn-active-primary');
+                    }
+                });
+            }
+
+            submitButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                validator.validate().then(function (status) {
+                    if (status === 'Valid') {
+                        submitButton.setAttribute('data-kt-indicator', 'on');
+                        submitButton.disabled = true;
+
+                        $.ajax({
+                            type: "POST",
+                            url: base_url + '/master/role/insert',
+                            data: {
+                                'name': $('#name').val(),
+                                'permission': $('#permission').val(),
+                                '_token': csrf_token
+                            },
+                            success: function (response) {
+                                if (response.status == true) {
+                                    Swal.fire({
+                                        title: "Success",
+                                        text: "Data Role Berhasil Ditambahkan!",
+                                        icon: "success",
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    }).then(() => {
+                                        $('#kt_datatable_role').DataTable().ajax.reload();
+                                        modal.hide();
+                                        form.reset();
+                                        selectAllButton.innerHTML = '<i class="ki-duotone ki-check-double fs-2"></i> Pilih Semua Permission';
+                                        selectAllButton.classList.remove('btn-active-primary');
+                                        selectAllButton.classList.add('btn-light-primary');
+                                    });
+                                }
+                                else {
+                                    Swal.fire('Oops...', response.data, 'error');
+                                }
+                            },
+                            error: function (xhr) {
+                                Swal.fire("Error!", "Terjadi kesalahan saat menyimpan.", "error");
+                            },
+                            complete: function () {
+                                submitButton.removeAttribute('data-kt-indicator');
+                                submitButton.disabled = false;
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            text: "Maaf, Mohon lengkapi form terlebih dahulu.",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, Mengerti!",
+                            customClass: { confirmButton: "btn btn-primary" }
+                        });
+                    }
+                });
+            });
+        };
 }();
 
 // Modul untuk mengelola logika form Edit Role
-const KTDataEdit = function () {
-    const modalElement = document.getElementById('kt_modal_edit_role');
-    const form = document.getElementById('kt_docs_form_edit_role');
-    const submitButton = document.getElementById('kt_docs_form_edit_role_submit');
-    const modal = new bootstrap.Modal(modalElement);
-    let validator;
+    const KTDataEdit = function () {
+        const modalElement = document.getElementById('kt_modal_edit_role');
+        const form = document.getElementById('kt_docs_form_edit_role');
+        const submitButton = document.getElementById('kt_docs_form_edit_role_submit');
+        const selectAllButton = document.getElementById('btn_select_all_permissions_edit');
+        const modal = new bootstrap.Modal(modalElement);
+        let validator;
 
-    const openModal = function (id) {
-        // Reset form
-        form.reset();
+        const openModal = function (id) {
+            // Reset form
+            form.reset();
 
-        $.ajax({
-            type: "GET",
-            url: base_url + '/master/role/detail/' + id,
-            success: function (response) {
-                if (response.status == true) {
-                    $('#role_id').val(response.data.detail_role.id);
-                    $('#name_edit').val(response.data.detail_role.name);
-                    $("#permission_edit").select2().val(response.data.role_permission).trigger('change.select2');
-
-                    modal.show();
-                }
-                else {
-                    Swal.fire('Oops...', 'Ada yang salah, silakan coba lagi!', 'error');
-                }
-            },
-            error: function () {
-                Swal.fire("Error", "Gagal mengambil data.", "error");
+            // Reset select all button
+            if (selectAllButton) {
+                selectAllButton.innerHTML = '<i class="ki-duotone ki-check-double fs-2"></i> Pilih Semua Permission';
+                selectAllButton.classList.remove('btn-active-primary');
+                selectAllButton.classList.add('btn-light-primary');
             }
-        });
-    };
 
-    const handleForm = function () {
-        validator = FormValidation.formValidation(
-            form,
-            {
-                fields: {
-                    'name_edit': {
-                        validators: {
-                            notEmpty: { message: 'Nama Harus Diisi' }
-                        }
-                    },
-                    'permission_edit': {
-                        validators: {
-                            notEmpty: { message: 'Permission Harus Diisi' }
-                        }
-                    },
+            $.ajax({
+                type: "GET",
+                url: base_url + '/master/role/detail/' + id,
+                success: function (response) {
+                    if (response.status == true) {
+                        $('#role_id').val(response.data.detail_role.id);
+                        $('#name_edit').val(response.data.detail_role.name);
+                        $("#permission_edit").select2().val(response.data.role_permission).trigger('change.select2');
+                        
+                        modal.show();
+                    } else {
+                        Swal.fire('Oops...', 'Ada yang salah, silakan coba lagi!', 'error');
+                    }
                 },
-                plugins: {
-                    trigger: new FormValidation.plugins.Trigger(),
-                    bootstrap: new FormValidation.plugins.Bootstrap5({
-                        rowSelector: '.fv-row',
-                        eleInvalidClass: '',
-                        eleValidClass: ''
-                    })
-                }
-            }
-        );
-
-        // Revalidate Select2 input
-        $(form.querySelector('[name="permission_edit"]')).on('change', function () {
-            validator.revalidateField('permission_edit');
-        });
-
-        submitButton.addEventListener('click', function (e) {
-            e.preventDefault();
-            validator.validate().then(function (status) {
-                if (status === 'Valid') {
-                    submitButton.setAttribute('data-kt-indicator', 'on');
-                    submitButton.disabled = true;
-
-                    $.ajax({
-                        type: "POST",
-                        url: base_url + '/master/role/update/' + $('#role_id').val(),
-                        data: {
-                            'name': $('#name_edit').val(),
-                            'permission': $('#permission_edit').val(),
-                            '_token': csrf_token
-                        },
-                        success: function (response) {
-                            if (response.status == true) {
-                                Swal.fire({
-                                    title: "Success",
-                                    text: "Data Role Berhasil Diupdate!",
-                                    icon: "success",
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    $('#kt_datatable_role').DataTable().ajax.reload();
-                                    modal.hide();
-                                    form.reset();
-                                });
-                            }
-                            else {
-                                Swal.fire('Oops...', response.data, 'error');
-                            }
-                        },
-                        error: function (xhr) {
-                            Swal.fire("Error!", "Terjadi kesalahan saat update.", "error");
-                        },
-                        complete: function () {
-                            submitButton.removeAttribute('data-kt-indicator');
-                            submitButton.disabled = false;
-                        }
-                    });
-                } else {
-                    Swal.fire({
-                        text: "Maaf, Mohon lengkapi form terlebih dahulu.",
-                        icon: "error",
-                        buttonsStyling: false,
-                        confirmButtonText: "Ok, Mengerti!",
-                        customClass: { confirmButton: "btn btn-primary" }
-                    });
+                error: function () {
+                    Swal.fire("Error", "Gagal mengambil data.", "error");
                 }
             });
-        });
-    };
+        };
+
+        const handleForm = function () {
+            validator = FormValidation.formValidation(
+                form,
+                {
+                    fields: {
+                        'name_edit': {
+                            validators: {
+                                notEmpty: { message: 'Nama Harus Diisi' }
+                            }
+                        },
+                        'permission_edit': {
+                            validators: {
+                                notEmpty: { message: 'Permission Harus Diisi' }
+                            }
+                        },
+                    },
+                    plugins: {
+                        trigger: new FormValidation.plugins.Trigger(),
+                        bootstrap: new FormValidation.plugins.Bootstrap5({
+                            rowSelector: '.fv-row',
+                            eleInvalidClass: '',
+                            eleValidClass: ''
+                        })
+                    }
+                }
+            );
+
+            // Revalidate Select2 input
+            $(form.querySelector('[name="permission_edit"]')).on('change', function () {
+                validator.revalidateField('permission_edit');
+            });
+
+            // Select All Permissions functionality
+            if (selectAllButton) {
+                selectAllButton.addEventListener('click', function() {
+                    const permissionSelect = $('#permission_edit');
+                    const allOptions = permissionSelect.find('option:not(:disabled)').map(function() {
+                        return $(this).val();
+                    }).get();
+
+                    if (permissionSelect.val().length === allOptions.length) {
+                        permissionSelect.val(null).trigger('change');
+                        selectAllButton.innerHTML = '<i class="ki-duotone ki-check-double fs-2"></i> Pilih Semua Permission';
+                        selectAllButton.classList.remove('btn-active-primary');
+                        selectAllButton.classList.add('btn-light-primary');
+                    } else {
+                        permissionSelect.val(allOptions).trigger('change');
+                        selectAllButton.innerHTML = '<i class="ki-duotone ki-cross fs-2"></i> Hapus Semua Selection';
+                        selectAllButton.classList.remove('btn-light-primary');
+                        selectAllButton.classList.add('btn-active-primary');
+                    }
+                });
+            }
+
+            submitButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                validator.validate().then(function (status) {
+                    if (status === 'Valid') {
+                        submitButton.setAttribute('data-kt-indicator', 'on');
+                        submitButton.disabled = true;
+
+                        $.ajax({
+                            type: "POST",
+                            url: base_url + '/master/role/update/' + $('#role_id').val(),
+                            data: {
+                                'name': $('#name_edit').val(),
+                                'permission': $('#permission_edit').val(),
+                                '_token': csrf_token
+                            },
+                            success: function (response) {
+                                if (response.status == true) {
+                                    Swal.fire({
+                                        title: "Success",
+                                        text: "Data Role Berhasil Diupdate!",
+                                        icon: "success",
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    }).then(() => {
+                                        $('#kt_datatable_role').DataTable().ajax.reload();
+                                        modal.hide();
+                                        form.reset();
+                                        
+                                        // Reset select all button
+                                        if (selectAllButton) {
+                                            selectAllButton.innerHTML = '<i class="ki-duotone ki-check-double fs-2"></i> Pilih Semua Permission';
+                                            selectAllButton.classList.remove('btn-active-primary');
+                                            selectAllButton.classList.add('btn-light-primary');
+                                        }
+                                    });
+                                }
+                                else {
+                                    Swal.fire('Oops...', response.data, 'error');
+                                }
+                            },
+                            error: function (xhr) {
+                                Swal.fire("Error!", "Terjadi kesalahan saat update.", "error");
+                            },
+                            complete: function () {
+                                submitButton.removeAttribute('data-kt-indicator');
+                                submitButton.disabled = false;
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            text: "Maaf, Mohon lengkapi form terlebih dahulu.",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, Mengerti!",
+                            customClass: { confirmButton: "btn btn-primary" }
+                        });
+                    }
+                });
+            });
+        };
 
     return {
         init: function () {
