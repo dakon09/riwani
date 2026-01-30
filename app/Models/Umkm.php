@@ -68,35 +68,35 @@ class Umkm extends Model
 
     public function province()
     {
-        return $this->belongsTo(\Laravolt\Indonesia\Models\Province::class, 'provinsi_id');
+        return $this->belongsTo(\Laravolt\Indonesia\Models\Province::class, 'provinsi_id', 'code');
     }
 
     public function city()
     {
-        return $this->belongsTo(\Laravolt\Indonesia\Models\City::class, 'kabupaten_id');
+        return $this->belongsTo(\Laravolt\Indonesia\Models\City::class, 'kabupaten_id', 'code');
     }
 
     public function district()
     {
-        return $this->belongsTo(\Laravolt\Indonesia\Models\District::class, 'kecamatan_id');
+        return $this->belongsTo(\Laravolt\Indonesia\Models\District::class, 'kecamatan_id', 'code');
     }
 
     public function village()
     {
-        return $this->belongsTo(\Laravolt\Indonesia\Models\Village::class, 'kelurahan_id');
+        return $this->belongsTo(\Laravolt\Indonesia\Models\Village::class, 'kelurahan_id', 'code');
     }
 
     public static function generateUmkmCode()
     {
         $lastCode = self::withTrashed()->max('umkm_code');
 
-        if (!$lastCode) {
+        if (! $lastCode) {
             return 'UMKM001';
         }
 
         $number = intval(substr($lastCode, 4)) + 1;
 
-        return 'UMKM' . str_pad($number, 3, '0', STR_PAD_LEFT);
+        return 'UMKM'.str_pad($number, 3, '0', STR_PAD_LEFT);
     }
 
     public function scopeManual($query)

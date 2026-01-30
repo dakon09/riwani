@@ -92,6 +92,7 @@ Route::prefix('portal')->name('portal.')->group(function () {
     Route::middleware('umkm.auth')->group(function () {
         Route::post('/logout', [PortalAuthController::class, 'logout'])->name('logout');
         Route::get('/profile', [PortalProfileController::class, 'show'])->name('profile');
+        Route::get('/profile/edit', [PortalProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile', [PortalProfileController::class, 'update'])->name('profile.update');
     });
 });
