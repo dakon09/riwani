@@ -63,6 +63,57 @@ class UmkmImport implements ToModel, WithBatchInserts, WithChunkReading, WithHea
             return null;
         }
 
+        // Strict Regional Validation
+        $province = \Laravolt\Indonesia\Models\Province::where('name', $row['provinsi'])->first();
+        if (!$province) {
+            $this->failedRow++;
+            $this->errors[] = [
+                'row' => $this->totalRow,
+                'nama_usaha' => $namaUsaha,
+                'message' => "Provinsi '{$row['provinsi']}' tidak ditemukan. Pastikan penulisan sesuai master data.",
+            ];
+            return null;
+        }
+
+        $city = \Laravolt\Indonesia\Models\City::where('province_code', $province->code)
+            ->where('name', $row['kabupaten'])
+            ->first();
+        if (!$city) {
+            $this->failedRow++;
+            $this->errors[] = [
+                'row' => $this->totalRow,
+                'nama_usaha' => $namaUsaha,
+                'message' => "Kabupaten/Kota '{$row['kabupaten']}' tidak ditemukan di Provinsi '{$province->name}'.",
+            ];
+            return null;
+        }
+
+        $district = \Laravolt\Indonesia\Models\District::where('city_code', $city->code)
+            ->where('name', $row['kecamatan'])
+            ->first();
+        if (!$district) {
+            $this->failedRow++;
+            $this->errors[] = [
+                'row' => $this->totalRow,
+                'nama_usaha' => $namaUsaha,
+                'message' => "Kecamatan '{$row['kecamatan']}' tidak ditemukan di Kabupaten '{$city->name}'.",
+            ];
+            return null;
+        }
+
+        $village = \Laravolt\Indonesia\Models\Village::where('district_code', $district->code)
+            ->where('name', $row['kelurahan'])
+            ->first();
+        if (!$village) {
+            $this->failedRow++;
+            $this->errors[] = [
+                'row' => $this->totalRow,
+                'nama_usaha' => $namaUsaha,
+                'message' => "Kelurahan '{$row['kelurahan']}' tidak ditemukan di Kecamatan '{$district->name}'.",
+            ];
+            return null;
+        }
+
         try {
             $umkm = new Umkm([
                 'umkm_code' => Umkm::generateUmkmCode(),
@@ -71,10 +122,10 @@ class UmkmImport implements ToModel, WithBatchInserts, WithChunkReading, WithHea
                 'sektor_usaha' => $row['sektor_usaha'] ?? null,
                 'tahun_berdiri' => $row['tahun_berdiri'] ?? null,
                 'alamat_usaha' => $row['alamat_usaha'] ?? null,
-                'provinsi_id' => $this->getRegionId(\Laravolt\Indonesia\Models\Province::class, $row['provinsi'] ?? null),
-                'kabupaten_id' => $this->getRegionId(\Laravolt\Indonesia\Models\City::class, $row['kabupaten'] ?? null),
-                'kecamatan_id' => $this->getRegionId(\Laravolt\Indonesia\Models\District::class, $row['kecamatan'] ?? null),
-                'kelurahan_id' => $this->getRegionId(\Laravolt\Indonesia\Models\Village::class, $row['kelurahan'] ?? null),
+                'provinsi_id' => $province->code,
+                'kabupaten_id' => $city->code,
+                'kecamatan_id' => $district->code,
+                'kelurahan_id' => $village->code,
                 'kode_pos' => $row['kode_pos'] ?? null,
                 'status_umkm' => 'REGISTERED',
                 'source_input' => 'IMPORT',
@@ -136,23 +187,5 @@ class UmkmImport implements ToModel, WithBatchInserts, WithChunkReading, WithHea
     public function getErrors()
     {
         return $this->errors;
-    }
-
-    private function getRegionId($modelClass, $name)
-    {
-        if (!$name)
-            return null;
-
-        // Try exact match first
-        $region = $modelClass::where('name', $name)->first();
-        if ($region)
-            return $region->code;
-
-        // Try loose match
-        $region = $modelClass::where('name', 'like', '%' . $name . '%')->first();
-        if ($region)
-            return $region->code;
-
-        return null;
     }
 }

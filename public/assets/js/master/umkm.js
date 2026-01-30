@@ -9,17 +9,9 @@ $(document).ready(function () {
             type: 'GET'
         },
         columns: [
-            {
-                data: 'DT_RowIndex',
-                name: 'DT_RowIndex',
-                orderable: false,
-                searchable: false,
-                className: 'text-center'
-            },
             { data: 'umkm_code', name: 'umkm_code' },
             { data: 'nama_usaha', name: 'nama_usaha' },
             { data: 'jenis_usaha', name: 'jenis_usaha' },
-            { data: 'sektor_usaha', name: 'sektor_usaha' },
             { data: 'nama_pemilik', name: 'nama_pemilik' },
             { data: 'no_hp', name: 'no_hp' },
             { data: 'source_badge', name: 'source_input', orderable: false, searchable: false },

@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
     var dropzone;
     var previewSection = $('#previewSection');
     var errorsSection = $('#errorsSection');
@@ -12,15 +12,15 @@ $(document).ready(function() {
             maxFilesize: 10,
             acceptedFiles: ".xlsx,.xls,.csv",
             addRemoveLinks: true,
-            autoProcessQueue: false,
+            autoProcessQueue: true,
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            init: function() {
-                this.on("addedfile", function(file) {
+            init: function () {
+                this.on("addedfile", function (file) {
                     var removeButton = Dropzone.createElement("<button class='btn btn-sm btn-danger'>Batal</button>");
                     var _this = this;
-                    removeButton.addEventListener("click", function(e) {
+                    removeButton.addEventListener("click", function (e) {
                         e.preventDefault();
                         e.stopPropagation();
                         _this.removeFile(file);
@@ -28,7 +28,15 @@ $(document).ready(function() {
                     file.previewElement.appendChild(removeButton);
                 });
 
-                this.on("success", function(file, response) {
+                this.on("success", function (file, response) {
+                    // Check if response is HTML (Import Preview View)
+                    if (typeof response === 'string') {
+                        document.open();
+                        document.write(response);
+                        document.close();
+                        return;
+                    }
+
                     if (response.status === 'success') {
                         showPreview(response.data);
                         dropzone.disable();
@@ -42,7 +50,7 @@ $(document).ready(function() {
                     }
                 });
 
-                this.on("error", function(file, errorMessage) {
+                this.on("error", function (file, errorMessage) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -50,7 +58,7 @@ $(document).ready(function() {
                     });
                 });
 
-                this.on("processing", function() {
+                this.on("processing", function () {
                     Swal.fire({
                         title: 'Processing',
                         text: 'Mohon tunggu, sedang memproses file...',
@@ -61,13 +69,13 @@ $(document).ready(function() {
                     });
                 });
 
-                this.on("complete", function() {
+                this.on("complete", function () {
                     Swal.close();
                 });
             }
         });
 
-        $('#cancelBtn').on('click', function() {
+        $('#cancelBtn').on('click', function () {
             dropzone.enable();
             dropzone.removeAllFiles();
             previewSection.hide();
@@ -86,7 +94,7 @@ $(document).ready(function() {
             var tbody = $('#errorsTableBody');
             tbody.empty();
 
-            data.errors.forEach(function(error) {
+            data.errors.forEach(function (error) {
                 var row = '<tr>' +
                     '<td>' + (error.row || '-') + '</td>' +
                     '<td>' + (error.nama_usaha || '-') + '</td>' +

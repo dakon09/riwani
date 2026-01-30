@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Portal;
 
-use App\Models\Umkm;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
-class UmkmUpdateRequest extends FormRequest
+class UmkmProfileUpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,9 +14,7 @@ class UmkmUpdateRequest extends FormRequest
 
     public function rules(): array
     {
-        $umkmId = $this->route('umkm');
-        $umkm = Umkm::find($umkmId);
-        $userId = $umkm?->user_id;
+        $userId = Auth::guard('umkm')->id();
 
         return [
             'username' => 'required|string|min:4|max:50|unique:users,username,'.$userId,
@@ -31,7 +29,6 @@ class UmkmUpdateRequest extends FormRequest
             'kecamatan_id' => 'nullable|exists:indonesia_districts,code',
             'kelurahan_id' => 'nullable|exists:indonesia_villages,code',
             'kode_pos' => 'nullable|string|max:10',
-            'status_umkm' => 'nullable|in:DRAFT,REGISTERED,ACTIVE,INACTIVE',
             'nama_pemilik' => 'required|string|max:255',
             'nik_pemilik' => 'nullable|digits:16',
             'no_hp' => 'required|string|max:15',
@@ -41,7 +38,6 @@ class UmkmUpdateRequest extends FormRequest
             'npwp' => 'nullable|string|max:20',
             'nib' => 'nullable|string|max:20',
             'izin_usaha' => 'nullable|string|max:255',
-            'status_legalitas' => 'nullable|in:LENGKAP,BELUM',
         ];
     }
 

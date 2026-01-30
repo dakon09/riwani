@@ -5,6 +5,8 @@ use App\Http\Controllers\Master\PermissionController;
 use App\Http\Controllers\Master\RoleController;
 use App\Http\Controllers\Master\UmkmController;
 use App\Http\Controllers\Master\UserController;
+use App\Http\Controllers\Portal\AuthController as PortalAuthController;
+use App\Http\Controllers\Portal\ProfileController as PortalProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -13,6 +15,7 @@ Route::get('/', function () {
 
 Route::name('dashboard.')->middleware(['auth:web', config('jetstream.auth_session'), 'verified'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('index');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('home');
 });
 
 Route::post('/profile/update', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update_ajax')->middleware('auth');
@@ -57,6 +60,7 @@ Route::name('master.')->prefix('master')->middleware(['auth:web', config('jetstr
         Route::post('/', 'store')->name('store');
         Route::get('/import', 'import')->name('import');
         Route::post('/import', 'processImport')->name('process-import');
+        Route::post('/import-fix', 'storeImportFix')->name('store-import-fix');
         Route::get('/download-template', 'downloadTemplate')->name('download-template');
         Route::get('/{umkm}', 'show')->name('show');
         Route::get('/{umkm}/edit', 'edit')->name('edit');
@@ -67,11 +71,27 @@ Route::name('master.')->prefix('master')->middleware(['auth:web', config('jetstr
 });
 
 Route::middleware(['auth:web', config('jetstream.auth_session'), 'verified'])->group(function () {
-    // Regional Data Helpers (AJAX)
-    Route::controller(\App\Http\Controllers\Api\RegionController::class)->prefix('ajax/region')->group(function () {
-        Route::get('/provinces', 'provinces')->name('api.provinces');
-        Route::get('/cities/{provinceId}', 'cities')->name('api.cities');
-        Route::get('/districts/{cityId}', 'districts')->name('api.districts');
-        Route::get('/villages/{districtId}', 'villages')->name('api.villages');
+    // Auth protected routes if any remaining
+});
+
+// Regional Data Helpers (AJAX) - Public for Portal Access
+Route::controller(\App\Http\Controllers\Api\RegionController::class)->prefix('ajax/region')->group(function () {
+    Route::get('/provinces', 'provinces')->name('api.provinces');
+    Route::get('/cities/{provinceId}', 'cities')->name('api.cities');
+    Route::get('/districts/{cityId}', 'districts')->name('api.districts');
+    Route::get('/villages/{districtId}', 'villages')->name('api.villages');
+});
+
+// Portal UMKM Routes
+Route::prefix('portal')->name('portal.')->group(function () {
+    Route::middleware('umkm.guest')->group(function () {
+        Route::get('/login', [PortalAuthController::class, 'showLoginForm'])->name('login');
+        Route::post('/login', [PortalAuthController::class, 'login'])->name('login.post');
+    });
+
+    Route::middleware('umkm.auth')->group(function () {
+        Route::post('/logout', [PortalAuthController::class, 'logout'])->name('logout');
+        Route::get('/profile', [PortalProfileController::class, 'show'])->name('profile');
+        Route::put('/profile', [PortalProfileController::class, 'update'])->name('profile.update');
     });
 });

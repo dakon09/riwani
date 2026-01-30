@@ -33,11 +33,9 @@
             <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_datatable">
                 <thead>
                     <tr>
-                        <th class="text-center" style="width: 50px;">No</th>
                         <th>Kode UMKM</th>
                         <th>Nama Usaha</th>
                         <th>Jenis Usaha</th>
-                        <th>Sektor</th>
                         <th>Pemilik</th>
                         <th>No HP</th>
                         <th>Sumber</th>
