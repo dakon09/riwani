@@ -94,8 +94,17 @@
                                 <!--begin:Menu item-->
                                 <div class="menu-item me-0 me-lg-2">
                                     <!--begin:Menu link-->
-                                    <a class="menu-link active" href="{{ route('portal.profile') }}">
+                                    <a class="menu-link {{ request()->routeIs('portal.profile*') ? 'active' : '' }}" href="{{ route('portal.profile') }}">
                                         <span class="menu-title">Profil Usaha</span>
+                                    </a>
+                                    <!--end:Menu link-->
+                                </div>
+                                <!--end:Menu item-->
+                                <!--begin:Menu item-->
+                                <div class="menu-item me-0 me-lg-2">
+                                    <!--begin:Menu link-->
+                                    <a class="menu-link {{ request()->routeIs('portal.business-plan*') ? 'active' : '' }}" href="{{ route('portal.business-plan.index') }}">
+                                        <span class="menu-title">Bisnis Plan</span>
                                     </a>
                                     <!--end:Menu link-->
                                 </div>
