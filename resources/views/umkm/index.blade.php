@@ -46,7 +46,7 @@
             </table>
         </div>
         <!--end::Card body-->
-    </div>
+    
     </div>
     <!--end::Post-->
 

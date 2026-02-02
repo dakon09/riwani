@@ -3,7 +3,15 @@
 @section('content')
     <!--begin::Post-->
     <!--begin::Post-->
-    <form action="{{ route('master.umkm.store') }}" method="POST" id="kt_account_profile_details_form" class="form">
+    <form action="{{ route('master.umkm.store') }}" method="POST" id="umkm_form" class="form"
+        data-provinces-url="{{ route('api.provinces') }}"
+        data-cities-url="{{ route('api.cities', 0) }}"
+        data-districts-url="{{ route('api.districts', 0) }}"
+        data-villages-url="{{ route('api.villages', 0) }}"
+        data-initial-province=""
+        data-initial-city=""
+        data-initial-district=""
+        data-initial-village="">
         @csrf
         
         <!--begin::Toolbar-->
@@ -325,94 +333,5 @@
 @endsection
 
 @section('script')
-    <script>
-        $(document).ready(function () {
-            // Init Select2 for static fields if not already working
-            // $('[data-control="select2"]').select2();
-
-            // Load Provinces on page load
-            $.ajax({
-                url: "{{ route('api.provinces') }}",
-                type: "GET",
-                dataType: "json",
-                success: function (data) {
-                    $.each(data, function (key, value) {
-                        $('#provinsi_id').append('<option value="' + value.code + '">' + value.name + '</option>');
-                    });
-                }
-            });
-
-            // On Province Change
-            $('#provinsi_id').on('change', function () {
-                var provinceId = $(this).val();
-                $('#kabupaten_id').empty().append('<option value="">Pilih Kabupaten/Kota</option>').prop('disabled', true);
-                $('#kecamatan_id').empty().append('<option value="">Pilih Kecamatan</option>').prop('disabled', true);
-                $('#kelurahan_id').empty().append('<option value="">Pilih Kelurahan</option>').prop('disabled', true);
-
-                if (provinceId) {
-                    var url = "{{ route('api.cities', 0) }}";
-                    url = url.replace('/0', '/' + provinceId);
-
-                    $.ajax({
-                        url: url,
-                        type: "GET",
-                        dataType: "json",
-                        success: function (data) {
-                            $.each(data, function (key, value) {
-                                $('#kabupaten_id').append('<option value="' + value.code + '">' + value.name + '</option>');
-                            });
-                            $('#kabupaten_id').prop('disabled', false);
-                        }
-                    });
-                }
-            });
-
-            // On City Change
-            $('#kabupaten_id').on('change', function () {
-                var cityId = $(this).val();
-                $('#kecamatan_id').empty().append('<option value="">Pilih Kecamatan</option>').prop('disabled', true);
-                $('#kelurahan_id').empty().append('<option value="">Pilih Kelurahan</option>').prop('disabled', true);
-
-                if (cityId) {
-                    var url = "{{ route('api.districts', 0) }}";
-                    url = url.replace('/0', '/' + cityId);
-
-                    $.ajax({
-                        url: url,
-                        type: "GET",
-                        dataType: "json",
-                        success: function (data) {
-                            $.each(data, function (key, value) {
-                                $('#kecamatan_id').append('<option value="' + value.code + '">' + value.name + '</option>');
-                            });
-                            $('#kecamatan_id').prop('disabled', false);
-                        }
-                    });
-                }
-            });
-
-            // On District Change
-            $('#kecamatan_id').on('change', function () {
-                var districtId = $(this).val();
-                $('#kelurahan_id').empty().append('<option value="">Pilih Kelurahan</option>').prop('disabled', true);
-
-                if (districtId) {
-                    var url = "{{ route('api.villages', 0) }}";
-                    url = url.replace('/0', '/' + districtId);
-
-                    $.ajax({
-                        url: url,
-                        type: "GET",
-                        dataType: "json",
-                        success: function (data) {
-                            $.each(data, function (key, value) {
-                                $('#kelurahan_id').append('<option value="' + value.code + '">' + value.name + '</option>');
-                            });
-                            $('#kelurahan_id').prop('disabled', false);
-                        }
-                    });
-                }
-            });
-        });
-    </script>
+    <script src="{{ asset('assets/js/master/umkm-form.js') }}"></script>
 @endsection

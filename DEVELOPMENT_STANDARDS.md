@@ -222,6 +222,34 @@ class [Entity]Controller extends Controller
 - **Redirect dengan flash message**
 - **JSON response** untuk AJAX delete
 - **findOrFail** untuk single record retrieval
+- **Sanitasi & validasi** mengikuti pola di bawah ini (Validator + Elegant Sanitizer):
+  ```php
+  $validator = Validator::make($request->all(), [
+      'name' => 'required|unique:users,name',
+      'email' => 'required|unique:users,email',
+      'username' => 'required|unique:users,username',
+      'password' => 'required|confirmed',
+      'role' => 'required',
+  ]);
+
+  if ($validator->fails()) {
+      return response()->json([
+          'status' => false,
+          'data' => $this->validationErrorsToString($validator->errors()),
+      ], 200);
+  }
+
+  $filters = [
+      'name' => 'trim|escape|capitalize',
+      'email' => 'trim|escape',
+      'username' => 'trim|escape',
+      'password' => 'trim|escape',
+      'role' => 'trim|escape',
+  ];
+
+  $sanitizer = new Sanitizer($request->all(), $filters);
+  $attrclean = $sanitizer->sanitize();
+  ```
 
 ---
 
@@ -393,6 +421,40 @@ $(document).on('submit', 'form', function(e) {
 - **DataTables** untuk server-side tables
 - **SweetAlert2** untuk alerts (Metronic built-in)
 - **AJAX** untuk form submissions (opsional, bisa gunakan submit form biasa)
+- **Create/Update via JS** hanya untuk modal/satu halaman, contoh pola AJAX:
+  ```javascript
+  $.ajax({
+      type: "POST",
+      url: base_url + '/master/user/insert',
+      data: {
+          name: $('#name').val(),
+          username: $('#username').val(),
+          email: $('#email').val(),
+          role: $('#role').val(),
+          _token: csrf_token,
+      },
+      success: function (response) {
+          if (response.status == true) {
+              Swal.fire({
+                  title: "Success",
+                  text: "Data berhasil ditambahkan!",
+                  icon: "success",
+                  timer: 1500,
+                  showConfirmButton: false,
+              }).then(() => {
+                  $('#kt_datatable_user').DataTable().ajax.reload();
+              });
+          }
+      }
+  });
+  ```
+- **Jika halaman berbeda**, gunakan pola form biasa seperti `umkm/create` dan `umkm/edit` (submit via POST/PUT, redirect + flash message)
+- **Script JS wajib dipisahkan dari view**, contoh referensi:
+  ```blade
+  @section('script')
+      <script src="{{ asset('assets/js/master/user.js') }}"></script>
+  @endsection
+  ```
 
 ---
 
@@ -481,6 +543,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 - **Middleware**: `auth`, `verified`
 - **Named routes** untuk consistency
 - **Route grouping** untuk related routes
+- **Gate permission di route** dengan pola seperti modul user, contoh:
+  ```php
+  if (! auth()->user()?->can('umkm_create')) {
+      abort(403, 'Unauthorized');
+  }
+  ```
 
 ---
 

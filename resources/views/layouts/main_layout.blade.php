@@ -292,7 +292,7 @@
                                                         </div>
                                                         <!--end:Menu item-->
                                                     @endcan
-                                                    {{-- @can('master-permission')
+                                                    {{-- @can('master_permission')
                                                     <!--begin:Menu item-->
                                                     <div class="menu-item">
                                                         <!--begin:Menu link-->

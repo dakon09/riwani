@@ -2,7 +2,15 @@
 
 @section('content')
     <!--begin::Post-->
-    <form action="{{ route('master.umkm.update', $data->id) }}" method="POST" class="form">
+    <form action="{{ route('master.umkm.update', $data->id) }}" method="POST" id="umkm_form" class="form"
+        data-provinces-url="{{ route('api.provinces') }}"
+        data-cities-url="{{ route('api.cities', 0) }}"
+        data-districts-url="{{ route('api.districts', 0) }}"
+        data-villages-url="{{ route('api.villages', 0) }}"
+        data-initial-province="{{ $data->provinsi_id }}"
+        data-initial-city="{{ $data->kabupaten_id }}"
+        data-initial-district="{{ $data->kecamatan_id }}"
+        data-initial-village="{{ $data->kelurahan_id }}">
         @csrf
         @method('PUT')
 
@@ -360,125 +368,5 @@
 @endsection
 
 @section('script')
-    <script>
-        $(document).ready(function () {
-            var initialProv = "{{ $data->provinsi_id }}";
-            var initialCity = "{{ $data->kabupaten_id }}";
-            var initialDistrict = "{{ $data->kecamatan_id }}";
-            var initialVillage = "{{ $data->kelurahan_id }}";
-
-            // Load Provinces on page load
-            $.ajax({
-                url: "{{ route('api.provinces') }}",
-                type: "GET",
-                dataType: "json",
-                success: function (data) {
-                    // Clear existing options (except placeholder) to avoid duplicates with manual render
-                    // Actually manual render is just 1 option. We want the full list.
-                    // But we must preserve the 'selected' if we want to be safe, OR just re-select.
-                    $('#provinsi_id').empty().append('<option value="">Pilih Provinsi</option>');
-
-                    $.each(data, function (key, value) {
-                        var selected = (value.code == initialProv) ? 'selected' : '';
-                        $('#provinsi_id').append('<option value="' + value.code + '" ' + selected + '>' + value.name + '</option>');
-                    });
-
-                    // Trigger change to load cities if we have a province
-                    if (initialProv) {
-                        $('#provinsi_id').val(initialProv).trigger('change');
-                        // We don't nullify initialProv because we might need it for check, but actually we don't need to check it again.
-                    }
-                }
-            });
-
-            // On Province Change
-            $('#provinsi_id').on('change', function () {
-                var provinceId = $(this).val();
-                // Don't clear if it's the same request? No, always clear on change.
-                $('#kabupaten_id').empty().append('<option value="">Pilih Kabupaten/Kota</option>').prop('disabled', true);
-                $('#kecamatan_id').empty().append('<option value="">Pilih Kecamatan</option>').prop('disabled', true);
-                $('#kelurahan_id').empty().append('<option value="">Pilih Kelurahan</option>').prop('disabled', true);
-
-                if (provinceId) {
-                    var url = "{{ route('api.cities', 0) }}";
-                    url = url.replace('/0', '/' + provinceId);
-
-                    $.ajax({
-                        url: url,
-                        type: "GET",
-                        dataType: "json",
-                        success: function (data) {
-                            $.each(data, function (key, value) {
-                                $('#kabupaten_id').append('<option value="' + value.code + '">' + value.name + '</option>');
-                            });
-                            $('#kabupaten_id').prop('disabled', false);
-
-                            // Auto Select if matches initial
-                            if (initialCity && provinceId == initialProv) {
-                                $('#kabupaten_id').val(initialCity).trigger('change');
-                                initialCity = null; // Consume it
-                            }
-                        }
-                    });
-                }
-            });
-
-            // On City Change
-            $('#kabupaten_id').on('change', function () {
-                var cityId = $(this).val();
-                $('#kecamatan_id').empty().append('<option value="">Pilih Kecamatan</option>').prop('disabled', true);
-                $('#kelurahan_id').empty().append('<option value="">Pilih Kelurahan</option>').prop('disabled', true);
-
-                if (cityId) {
-                    var url = "{{ route('api.districts', 0) }}";
-                    url = url.replace('/0', '/' + cityId);
-
-                    $.ajax({
-                        url: url,
-                        type: "GET",
-                        dataType: "json",
-                        success: function (data) {
-                            $.each(data, function (key, value) {
-                                $('#kecamatan_id').append('<option value="' + value.code + '">' + value.name + '</option>');
-                            });
-                            $('#kecamatan_id').prop('disabled', false);
-
-                            if (initialDistrict && cityId == "{{ $data->kabupaten_id }}") {
-                                $('#kecamatan_id').val(initialDistrict).trigger('change');
-                                initialDistrict = null;
-                            }
-                        }
-                    });
-                }
-            });
-
-            // On District Change
-            $('#kecamatan_id').on('change', function () {
-                var districtId = $(this).val();
-                $('#kelurahan_id').empty().append('<option value="">Pilih Kelurahan</option>').prop('disabled', true);
-
-                if (districtId) {
-                    var url = "{{ route('api.villages', 0) }}";
-                    url = url.replace('/0', '/' + districtId);
-
-                    $.ajax({
-                        url: url,
-                        type: "GET",
-                        dataType: "json",
-                        success: function (data) {
-                            $.each(data, function (key, value) {
-                                $('#kelurahan_id').append('<option value="' + value.code + '">' + value.name + '</option>');
-                            });
-                            $('#kelurahan_id').prop('disabled', false);
-
-                            if (initialVillage && districtId == "{{ $data->kecamatan_id }}") {
-                                $('#kelurahan_id').val(initialVillage).trigger('change');
-                                initialVillage = null;
-                            }
-                        }
-                    });
-                }
-            });
-        });
-    </script>
+    <script src="{{ asset('assets/js/master/umkm-form.js') }}"></script>
 @endsection
